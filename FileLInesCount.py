@@ -39,7 +39,7 @@ def countLine(fname,detail=0):
     count = 0
     #    print('fname',fname)
     for file_line in open(fname,'r',encoding='utf-8'):
-        if file_line != '' and file_line != '/n': #过滤掉空行
+        if file_line != '' and file_line != '\n': #过滤掉空行
             count += 1
     if detail==1:
         print (fname + '----' , count)
@@ -50,15 +50,24 @@ def projectLinesCount(path,fileType,openLib):
     print('==========')
     folderName=path.split("/")[-1]
     filename=path+'/'+folderName+'.products.txt'
-    print('当前正在进行的目录',path)
-    print('源码合并后的文件名：',filename,'\n')
     r=open(filename,'wb')
     filelists=getFile(path,fileType,openLib)        
     totalline = 0
     for filelist in filelists:
         totalline = totalline + countLine(filelist)
-        t=open(filelist,'r',encoding='utf-8').read()			
-        r.write(t.encode())
+        t=open(filelist,'r',encoding='utf-8')
+        for file_line in t:        
+            if file_line!='' and file_line !='\n':
+    #            print('line:',line)
+                r.write(file_line.encode())
+    #把统计结果追加到源代码文件末尾。
+    r.write(('\n 当前正在进行的目录'+path).encode())
+    r.write(('\n 项目：'+folderName+' 总行数是:'+str(totalline)).encode())
+    r.write(('\n 源码合并后的文件名：'+filename).encode())
+    r.write(('\n Done! Cost Time: %0.2f second' % (time.clock() - startTime)).encode())
+    #命令行输出统计结果
+    print('当前正在进行的目录',path)
+    print('源码合并后的文件名：',filename,'\n')
     print ('项目：',folderName,' 总行数是:',totalline)
     print ('Project:',folderName,' TotalLines:',totalline)
     print ('Done! Cost Time: %0.2f second' % (time.clock() - startTime))
@@ -71,7 +80,11 @@ if __name__ == '__main__' :
     #目录组，只有一个软件项目时只填写一个。
     folders=[r'D:/项目/NongTaiProject/19本地测试环境/新建文件夹/场内驻守V1.1/garrison-APP-v1.1']
     #要排除的公共库文件    
-    openLib=('vue.js','vue.min.js','mui.js','mui.min.js','bootstrap.js','bootstrap.min.js','browser.min.js','jquery.validate.min.js','jquery-1.12.3.min.js','vue-router.js','vue-router.min.js','bootstrap.css','bootstrap.min.css','bootstrap-datetimepicker.min.css','mui.css','mui.min.css','vue-components.css','vue-components.js')
+    openLib=('vue.js','vue.min.js','mui.js','mui.min.js','bootstrap.js','bootstrap.min.js',
+    'browser.min.js','jquery.validate.min.js','jquery-1.12.3.min.js','vue-router.js','vue-router.min.js',
+    'bootstrap.css','bootstrap.min.css','bootstrap-datetimepicker.min.css','mui.css','mui.min.css',
+    'moment-with-locales.min.js','moment.min.js','moment.js','moment-timezone.min.js','moment-timezone-with-data.js','moment-timezone-with-data.min.js',
+    'vue-components.css','vue-components.js')
     # 统计的文件类型
     fileType = ['html', 'css', 'js','py']
     for i in folders:
